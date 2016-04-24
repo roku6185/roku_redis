@@ -10,6 +10,8 @@ typedef enum
   BULK_STRING,
   ARRAY,
   ERROR,
+  NIL,
+  NIL_ARRAY,
 } redis_object_type;
 
 typedef union
@@ -27,6 +29,8 @@ typedef struct redis_object
   int length;
 } redis_object;
 
+redis_object *redis_create_nil();
+redis_object *redis_create_nil_array();
 redis_object *redis_create_integer(int value);
 redis_object *redis_create_string(const char *value);
 redis_object *redis_create_bulk_string(const char *value, int length);

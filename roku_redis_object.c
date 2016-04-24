@@ -4,6 +4,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+redis_object *redis_create_nil()
+{
+  redis_object *obj = malloc(sizeof(redis_object));
+  obj->type = NIL;
+  obj->next = NULL;
+  return obj;
+}
+
+redis_object *redis_create_nil_array()
+{
+  redis_object *obj = malloc(sizeof(redis_object));
+  obj->type = NIL_ARRAY;
+  obj->next = NULL;
+  return obj;
+}
+
 redis_object *redis_create_integer(int value)
 {
   redis_object *obj = malloc(sizeof(redis_object));
@@ -81,11 +97,21 @@ const char *redis_serialize_object(redis_object *object)
 {
   switch(object->type)
   {
+  case NIL:
+    {
+      return "$-1\r\n";  
+    }
+    
+  case NIL_ARRAY:
+    {
+      return "*-1\r\n";  
+    }
+    
   case INTEGER:
     {
       int length = 3 + object->length;
       char *ret = malloc(length);
-      snprintf(ret, length, ":%d", object->value.integer);
+      snprintf(ret, length, ":%d\r\n", object->value.integer);
       return ret;
     }
 
@@ -180,7 +206,14 @@ redis_object *redis_deserialize_object(const char *data)
       {
         int length = 0;
         char *value = malloc(strlen(data));
-        sscanf(data, "$%d\r\n%s\r\n", &length, value);
+        
+        // Check for the null bulk string
+        if(sscanf(data, "$-%d\r\n", &length) == 1 && length == 1)
+          return redis_create_nil();
+        
+        if(sscanf(data, "$%d\r\n%s\r\n", &length, value) != 2)
+          return NULL;
+          
         return redis_create_bulk_string(value, length);
       }
     
@@ -189,8 +222,15 @@ redis_object *redis_deserialize_object(const char *data)
       {
         int length = 0;
         char *value = malloc(strlen(data));
-        sscanf(data, "*%d\r\n%s\r\n", &length, value);
-        //redis_deserialize_object(value);
+        
+        // Check for the null array
+        if(sscanf(data, "*-%d\r\n", &length) == 1 && length == 1)
+          return redis_create_nil_array();
+        
+        if(sscanf(data, "*%d\r\n%s", &length, value) != 2)
+          return NULL;
+        
+        redis_deserialize_object(value);
         //redis_create_array();
       }
       break;
@@ -209,6 +249,7 @@ void redis_free_object(redis_object *object)
   case STRING:
   case BULK_STRING:
   case ERROR:
+  case NIL:
     {
       //free((char *)object->value.string);
       free(object);
