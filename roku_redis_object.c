@@ -119,7 +119,7 @@ const char *redis_serialize_object(redis_object *object)
     {
       int length = 3 + object->length;
       char *ret = malloc(length);
-      snprintf(ret, length, "+%s", object->value.string);
+      snprintf(ret, length, "+%s\r\n", object->value.string);
       return ret;
     }
     
@@ -127,12 +127,17 @@ const char *redis_serialize_object(redis_object *object)
     {
       int length = 3 + object->length;
       char *ret = malloc(length);
-      snprintf(ret, length, "-%s", object->value.string);
+      snprintf(ret, length, "-%s\r\n", object->value.string);
       return ret;
     }
 
   case BULK_STRING:
-    break;
+    {
+      int length = 5 + object->length + 1;
+      char *ret = malloc(length);
+      snprintf(ret, length, "$%d\r\n%s\r\n", object->length, object->value.string);
+      return ret;
+    }
 
   case ARRAY:
     {
@@ -161,7 +166,7 @@ const char *redis_serialize_object(redis_object *object)
       
       int ret_length = strlen(buffer) + 3 + number_of_digits(object->length);
       char *ret = calloc(ret_length, 1);
-      snprintf(ret, ret_length, "*%d|%s", object->length, buffer);
+      snprintf(ret, ret_length, "*%d\r\n%s", object->length, buffer);
       free(buffer);
       return ret;
     }
@@ -181,7 +186,10 @@ redis_object *redis_deserialize_object(const char *data)
     case ':':
       {
         int value = 0;
-        sscanf(data, ":%d\r\n", &value);
+        
+        if(sscanf(data, ":%d\r\n", &value) != 1)
+          return NULL;
+          
         return redis_create_integer(value);
       }
     
@@ -189,7 +197,10 @@ redis_object *redis_deserialize_object(const char *data)
     case '+':
       {
         char *value = malloc(strlen(data));
-        sscanf(data, "+%s\r\n", value);
+        
+        if(sscanf(data, "+%s\r\n", value) != 1)
+          return NULL;
+          
         return redis_create_string(value);
       }
       
@@ -197,7 +208,10 @@ redis_object *redis_deserialize_object(const char *data)
     case '-':
       {
         char *value = malloc(strlen(data));
-        sscanf(data, "-%s\r\n", value);
+        
+        if(sscanf(data, "-%s\r\n", value) != 1)
+          return NULL;
+          
         return redis_create_error(value);
       }
     
