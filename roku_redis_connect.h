@@ -6,7 +6,7 @@
 
 struct pollfd conn;
 
-return_code roku_redis_connect(const char *hostname, int port);
+return_code roku_redis_connect(const char *hostname, const char *port);
 return_code roku_redis_close();
 
 #endif

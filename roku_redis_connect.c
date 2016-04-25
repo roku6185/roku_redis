@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-return_code roku_redis_connect(const char *hostname, int port)
+return_code roku_redis_connect(const char *hostname, const char *port)
 {
   int fd = -1, rv;
   struct addrinfo hints, *servinfo, *p;
@@ -15,7 +15,7 @@ return_code roku_redis_connect(const char *hostname, int port)
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
 
-  if((rv = getaddrinfo(hostname, "6666", &hints, &servinfo)) != 0)
+  if((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0)
   {
     return SOCKET_ADDRESS_TRANSLATION_FAILED;
   }
