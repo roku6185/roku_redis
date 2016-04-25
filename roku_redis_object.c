@@ -274,16 +274,6 @@ void redis_free_object(redis_object *object)
     
   switch(object->type)
   {
-  case STRING:
-  case BULK_STRING:
-  case ERROR:
-  case NIL:
-    {
-      //free((char *)object->value.string);
-      free(object);
-      return;
-    }
-
   case ARRAY:
     {
       redis_object *parent = object;
@@ -297,6 +287,12 @@ void redis_free_object(redis_object *object)
       }
       
       free(parent);
+      return;
+    }
+    
+  default:
+    {
+      free(object);
       return;
     }
   }
