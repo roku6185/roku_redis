@@ -39,7 +39,6 @@ void redis_array_push_back(redis_object *parent, redis_object *child);
 void redis_pretty_print_object(redis_object *object);
 const char *redis_serialize_object(redis_object *object);
 redis_object *redis_deserialize_object(const char *data);
-redis_object *redis_deserialize_object_internal(const char **data);
 void redis_free_object(redis_object *object);
 
 #endif

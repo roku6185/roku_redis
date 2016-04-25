@@ -160,11 +160,6 @@ const char *redis_serialize_object(redis_object *object)
   }
 }
 
-redis_object *redis_deserialize_object(const char *data)
-{
-  return redis_deserialize_object_internal(&data);
-}
-
 int internal_deserialize_integer(const char **data)
 {
   int value = 0;
@@ -265,6 +260,11 @@ redis_object *redis_deserialize_object_internal(const char **data)
   }
   
   return NULL;
+}
+
+redis_object *redis_deserialize_object(const char *data)
+{
+  return redis_deserialize_object_internal(&data);
 }
 
 void redis_free_object(redis_object *object)
