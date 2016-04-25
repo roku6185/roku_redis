@@ -94,14 +94,9 @@ const char *redis_serialize_object(redis_object *object)
       return "$-1\r\n";  
     }
     
-  case NIL_ARRAY:
-    {
-      return "*-1\r\n";  
-    }
-    
   case INTEGER:
     {
-      int length = 3 + object->length;
+      int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, ":%d\r\n", object->value.integer);
       return ret;
@@ -109,7 +104,7 @@ const char *redis_serialize_object(redis_object *object)
 
   case STRING:
     {
-      int length = 3 + object->length;
+      int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "+%s\r\n", object->value.string);
       return ret;
@@ -117,7 +112,7 @@ const char *redis_serialize_object(redis_object *object)
     
   case ERROR:
     {
-      int length = 3 + object->length;
+      int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "-%s\r\n", object->value.string);
       return ret;
@@ -125,7 +120,7 @@ const char *redis_serialize_object(redis_object *object)
 
   case BULK_STRING:
     {
-      int length = 5 + object->length + 1;
+      int length = 5 + number_of_digits(object->length) + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "$%d\r\n%s\r\n", object->length, object->value.string);
       return ret;
@@ -156,7 +151,7 @@ const char *redis_serialize_object(redis_object *object)
         tmp_obj = tmp_obj->next;
       }
       
-      int ret_length = strlen(buffer) + 3 + number_of_digits(object->length);
+      int ret_length = 3 + strlen(buffer) + number_of_digits(object->length) + 1;
       char *ret = calloc(ret_length, 1);
       snprintf(ret, ret_length, "*%d\r\n%s", object->length, buffer);
       free(buffer);
