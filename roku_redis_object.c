@@ -162,79 +162,106 @@ const char *redis_serialize_object(redis_object *object)
 
 redis_object *redis_deserialize_object(const char *data)
 {
-  int length = strlen(data);
+  return redis_deserialize_object_internal(&data);
+}
+
+int internal_deserialize_integer(const char **data)
+{
+  int value = 0;
   
-  if(length <= 0)
-    return NULL;
-  
-  switch(data[0])
+  while(**data != '\r')
   {
-    // INTEGER
+    value = (value * 10) + (**data - '0');
+    (*data)++;
+  }
+  
+  (*data) += 2; // skip trailing \r\n
+  return value;
+}
+
+char *internal_deserialize_string(const char **data)
+{
+  char *value = calloc(strlen(*data), 1);
+  int i = 0;
+  
+  while(**data != '\r')
+  {
+    value[i++] = **data;
+    (*data)++;
+  }
+  
+  (*data) += 2; // skip trailing \r\n
+  return value;
+}
+
+redis_object *redis_deserialize_object_internal(const char **data)
+{
+  switch(**data)
+  {
+    // INTEGER: :<integer>\r\n
     case ':':
       {
-        int value = 0;
-        
-        if(sscanf(data, ":%d\r\n", &value) != 1)
-          return NULL;
-          
+        (*data)++;
+        int value = internal_deserialize_integer(data);
         return redis_create_integer(value);
       }
     
-    // STRING
+    // STRING: +<string>\r\n
     case '+':
       {
-        char *value = malloc(strlen(data));
-        
-        if(sscanf(data, "+%s\r\n", value) != 1)
-          return NULL;
-          
+        (*data)++;
+        char *value = internal_deserialize_string(data);
         return redis_create_string(value);
       }
       
-    // ERROR
+    // ERROR: -<string>\r\n
     case '-':
       {
-        char *value = malloc(strlen(data));
-        
-        if(sscanf(data, "-%s\r\n", value) != 1)
-          return NULL;
-          
+        (*data)++;
+        char *value = internal_deserialize_string(data);
         return redis_create_error(value);
       }
     
-    // BULK_STRING
+    // BULK_STRING: $<integer>\r\n<string>\r\n
     case '$':
       {
-        int length = 0;
-        char *value = malloc(strlen(data));
+        (*data)++;
         
-        // Check for the null bulk string
-        if(sscanf(data, "$-%d\r\n", &length) == 1 && length == 1)
+        // Check for the null bulk string: $-1\r\n
+        if(**data == '-')
+        {
+          (*data) += 4;
           return redis_create_nil();
-        
-        if(sscanf(data, "$%d\r\n%s\r\n", &length, value) != 2)
-          return NULL;
+        }
           
+        int length = internal_deserialize_integer(data);
+        char *value = internal_deserialize_string(data);
         return redis_create_bulk_string(value, length);
       }
     
-    // ARRAY  
+    // ARRAY: *<integer>\r\n<entries>
     case '*':
       {
-        int length = 0;
-        char *value = malloc(strlen(data));
+        (*data)++;
         
-        // Check for the null array
-        if(sscanf(data, "*-%d\r\n", &length) == 1 && length == 1)
-          return redis_create_nil_array();
+        // Check for the null array: *-1\r\n
+        if(**data == '-')
+        {
+          (*data) += 4;
+          return redis_create_nil();
+        }
         
-        if(sscanf(data, "*%d\r\n%s", &length, value) != 2)
-          return NULL;
+        int length = internal_deserialize_integer(data);
+        redis_object *ret = redis_create_array();
         
-        redis_deserialize_object(value);
-        //redis_create_array();
+        for(int i = 0; i < length; i++)
+        {
+          redis_object *tmp = redis_deserialize_object_internal(data);
+          redis_array_push_back(ret, tmp);
+        }
+        
+        return ret;
       }
-      break;
   }
   
   return NULL;
