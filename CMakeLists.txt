@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
 project(redis_client)
 file(GLOB PROJECT_C_FILES *.c)
+set(EXECUTABLE_OUTPUT_PATH bin) 
 add_executable(main2 ${PROJECT_C_FILES} test/main2.c)
