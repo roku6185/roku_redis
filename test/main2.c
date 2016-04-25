@@ -2,11 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string.h>
+
 int main()
-{
+{  
   redis_object *obj1 = redis_create_integer(12345);
   const char *str1 = redis_serialize_object(obj1);
   printf("%s\n", str1);
+  redis_object *obj1_dup = redis_deserialize_object(str1);
+  redis_pretty_print_object(obj1_dup);
   free((char *)str1);
   redis_free_object(obj1);
   
@@ -14,6 +18,11 @@ int main()
   const char *str2 = redis_serialize_object(obj2);
   printf("%s\n", str2);
   redis_free_object(obj2);
+  
+  redis_object *obj2b = redis_create_bulk_string("bulk str", 8);
+  const char *str2b = redis_serialize_object(obj2b);
+  printf("%s\n", str2b);
+  redis_free_object(obj2b);
   
   redis_object *obj3 = redis_create_error("error message");
   const char *str3 = redis_serialize_object(obj3);
@@ -53,6 +62,9 @@ int main()
   
   const char *str6 = redis_serialize_object(obj6);
   printf("%s\n", str6);
+  
+  redis_object *obj6_dup = redis_deserialize_object(str6);
+  redis_pretty_print_object(obj6_dup);
   free((char *)str6);
   redis_free_object(obj6);
   
