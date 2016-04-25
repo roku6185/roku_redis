@@ -302,6 +302,10 @@ void redis_pretty_print_recursive(redis_object *object, int indent)
 {
   switch(object->type)
   {
+    case NIL:
+      printf("(nil)\n");
+      break;
+      
     case INTEGER:
       printf("%d (integer)\n", object->value.integer);
       break;
