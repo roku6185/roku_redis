@@ -12,14 +12,6 @@ redis_object *redis_create_nil()
   return obj;
 }
 
-redis_object *redis_create_nil_array()
-{
-  redis_object *obj = malloc(sizeof(redis_object));
-  obj->type = NIL_ARRAY;
-  obj->next = NULL;
-  return obj;
-}
-
 redis_object *redis_create_integer(int value)
 {
   redis_object *obj = malloc(sizeof(redis_object));
