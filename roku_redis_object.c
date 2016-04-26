@@ -197,7 +197,15 @@ redis_object *redis_deserialize_object_internal(const char **data)
     case ':':
       {
         (*data)++;
-        int value = internal_deserialize_integer(data);
+        int sign = 1;
+        
+        if(**data == '-')
+        {
+          sign = -1;
+          (*data)++;
+        }
+        
+        int value = sign * internal_deserialize_integer(data);
         return redis_create_integer(value);
       }
     
