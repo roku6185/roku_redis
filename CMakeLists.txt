@@ -5,6 +5,12 @@ project(redis_client)
 file(GLOB LIBREDISCLIENT_SRC_FILES *.c)
 add_library(redisclient STATIC ${LIBREDISCLIENT_SRC_FILES})
 
+# Compile test programs
+set(EXECUTABLE_OUTPUT_PATH bin)
+link_directories(.)
+add_executable(main apps/main.c)
+target_link_libraries(main redisclient)
+
 # Compile unittests
 set(EXECUTABLE_OUTPUT_PATH tests/bin)
 add_subdirectory(unity)
