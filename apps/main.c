@@ -1,15 +1,15 @@
-#include "roku_redis_connect.h"
-#include "roku_redis_write.h"
-#include "roku_redis_read.h"
-#include "roku_redis_object.h"
 #include <stdio.h>
 #include <string.h>
+#include "redis_connect.h"
+#include "redis_write.h"
+#include "redis_read.h"
+#include "redis_object.h"
 
 int main()
 {
   return_code status;
 
-  if((status = roku_redis_connect("127.0.0.1", "6379")) == SUCCESS)
+  if((status = redis_connect("127.0.0.1", "6379")) == SUCCESS)
     printf("Connected.\n");
   else
   {
@@ -23,7 +23,7 @@ int main()
   redis_array_push_back(cmd, param1);
   redis_array_push_back(cmd, param2);
   
-  if((status = roku_redis_send_command(cmd)) == SUCCESS)
+  if((status = redis_send_command(cmd)) == SUCCESS)
     printf("Command was sent successfully.\n");
   else
   {
@@ -32,7 +32,7 @@ int main()
   }
   
   char *buffer = NULL;
-  if((status = roku_redis_read(&buffer)) == SUCCESS)
+  if((status = redis_read(&buffer)) == SUCCESS)
   {
     redis_object *response = redis_deserialize_object(buffer);
     printf("Received response:\n");

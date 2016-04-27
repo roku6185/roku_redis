@@ -1,5 +1,5 @@
-#ifndef _ROKU_REDIS_ERRORS_H_
-#define _ROKU_REDIS_ERRORS_H_
+#ifndef _REDIS_ERRORS_H_
+#define _REDIS_ERRORS_H_
 
 typedef enum
 {

@@ -1,13 +1,13 @@
-#include "roku_redis_connect.h"
-#include "roku_redis_return_codes.h"
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <string.h>
+#include "redis_connect.h"
+#include "redis_return_codes.h"
 
-return_code roku_redis_read(char **result)
+return_code redis_read(char **result)
 {
   int poll_status = poll(&conn, 1, 10000);
 

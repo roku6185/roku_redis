@@ -1,12 +1,11 @@
-#include "roku_redis_connect.h"
+#include <unistd.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netdb.h>
-#include <unistd.h>
-#include <string.h>
+#include "redis_connect.h"
 
-
-return_code roku_redis_connect(const char *hostname, const char *port)
+return_code redis_connect(const char *hostname, const char *port)
 {
   int fd = -1, rv;
   struct addrinfo hints, *servinfo, *p;
@@ -44,7 +43,7 @@ return_code roku_redis_connect(const char *hostname, const char *port)
   return SUCCESS;
 }
 
-return_code roku_redis_close()
+return_code redis_close()
 {
   if(conn.fd)
   {

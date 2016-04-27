@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <unity/unity.h>
-#include "roku_redis_object.h"
+#include "redis_object.h"
 
 void test_serialize_nil()
 {

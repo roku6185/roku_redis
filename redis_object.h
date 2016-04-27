@@ -1,5 +1,5 @@
-#ifndef _ROKU_REDIS_DATA_TYPE_H_
-#define _ROKU_REDIS_DATA_TYPE_H_
+#ifndef _REDIS_DATA_TYPE_H_
+#define _REDIS_DATA_TYPE_H_
 
 typedef struct redis_object redis_object;
 
