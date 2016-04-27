@@ -1,5 +1,6 @@
 #include "roku_redis_connect.h"
 #include "roku_redis_return_codes.h"
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -25,12 +26,13 @@ return_code roku_redis_read(char **result)
 
   while(conn.revents & POLLIN)
   {
-    bytes = read(conn.fd, tmp_buffer, tmp_buffer_size);
+    bytes = recv(conn.fd, tmp_buffer, tmp_buffer_size, MSG_DONTWAIT);
+    
+    if(bytes <= 0)
+      break;
+      
     tmp_buffer[bytes] = 0;
     total_bytes += bytes;
-
-    if(bytes == 0)
-      break;
 
     if(total_bytes > heap_buffer_size)
     {
