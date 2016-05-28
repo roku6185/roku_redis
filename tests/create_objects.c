@@ -41,10 +41,21 @@ void test_create_error()
 void test_create_bulk_string()
 {
   const char *str = "testing";
-  redis_object *obj = redis_create_bulk_string(str, 7);
+  redis_object *obj = redis_create_bulk_string(str);
   TEST_ASSERT_EQUAL(obj->type, BULK_STRING);
   TEST_ASSERT_EQUAL(obj->length, 7);
   TEST_ASSERT_EQUAL(obj->value.string, str);
+  redis_free_object(obj);
+}
+
+void test_create_bulk_string_fixed_length()
+{
+  const char *str = "null \0 byte";
+  int length = 11;
+  redis_object *obj = redis_create_bulk_string_fixed_length(str, length);
+  TEST_ASSERT_EQUAL(obj->type, BULK_STRING);
+  TEST_ASSERT_EQUAL(obj->length, length);
+  TEST_ASSERT_EQUAL_MEMORY(obj->value.string, str, 11);
   redis_free_object(obj);
 }
 
@@ -67,6 +78,7 @@ int main()
   RUN_TEST(test_create_string);
   RUN_TEST(test_create_error);
   RUN_TEST(test_create_bulk_string);
+  RUN_TEST(test_create_bulk_string_fixed_length);
   RUN_TEST(test_create_array);
   return UNITY_END();
 }

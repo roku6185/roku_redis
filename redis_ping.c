@@ -5,8 +5,8 @@
 
 return_code redis_ping(const char *message)
 {
-  redis_object *param1 = redis_create_bulk_string("PING", 4);
-  redis_object *param2 = redis_create_bulk_string(message, strlen(message));
+  redis_object *param1 = redis_create_bulk_string("PING");
+  redis_object *param2 = redis_create_bulk_string(message);
   redis_object *cmd = redis_create_array();
   redis_array_push_back(cmd, param1);
   redis_array_push_back(cmd, param2);

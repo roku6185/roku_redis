@@ -17,8 +17,8 @@ int main()
     return 1;
   }
   
-  redis_object *param1 = redis_create_bulk_string("GET", 3);
-  redis_object *param2 = redis_create_bulk_string("mykey", 5);
+  redis_object *param1 = redis_create_bulk_string("GET");
+  redis_object *param2 = redis_create_bulk_string("mykey");
   redis_object *cmd = redis_create_array();
   redis_array_push_back(cmd, param1);
   redis_array_push_back(cmd, param2);

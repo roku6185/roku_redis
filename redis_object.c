@@ -32,7 +32,12 @@ redis_object *redis_create_string(const char *value)
   return obj;
 }
 
-redis_object *redis_create_bulk_string(const char *value, int length)
+redis_object *redis_create_bulk_string(const char *value)
+{
+  return redis_create_bulk_string_fixed_length(value, strlen(value));
+}
+
+redis_object *redis_create_bulk_string_fixed_length(const char *value, int length)
 {
   redis_object *obj = malloc(sizeof(redis_object));
   obj->type = BULK_STRING;
@@ -85,13 +90,16 @@ void redis_array_push_back(redis_object *parent, redis_object *child)
   parent->length++;
 }
 
-const char *redis_serialize_object(redis_object *object)
+redis_str_int redis_serialize_object(redis_object *object)
 {
   switch(object->type)
   {
   case NIL:
     {
-      return "$-1\r\n";  
+      int length = 5 + 1;
+      char *ret = malloc(length);
+      snprintf(ret, length, "$-1\r\n");
+      return (struct redis_str_int){ret, length};  
     }
     
   case INTEGER:
@@ -99,7 +107,7 @@ const char *redis_serialize_object(redis_object *object)
       int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, ":%d\r\n", object->value.integer);
-      return ret;
+      return (struct redis_str_int){ret, length};
     }
 
   case STRING:
@@ -107,7 +115,7 @@ const char *redis_serialize_object(redis_object *object)
       int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "+%s\r\n", object->value.string);
-      return ret;
+      return (struct redis_str_int){ret, length};
     }
     
   case ERROR:
@@ -115,15 +123,21 @@ const char *redis_serialize_object(redis_object *object)
       int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "-%s\r\n", object->value.string);
-      return ret;
+      return (struct redis_str_int){ret, length};
     }
 
   case BULK_STRING:
     {
-      int length = 5 + number_of_digits(object->length) + object->length + 1;
+      int prefix_length = 1 + number_of_digits(object->length) + 2;  
+      int length = prefix_length + object->length + 2;
       char *ret = malloc(length);
-      snprintf(ret, length, "$%d\r\n%s\r\n", object->length, object->value.string);
-      return ret;
+      snprintf(ret, length, "$%d\r\n", object->length);
+      memcpy(ret + prefix_length, object->value.string, object->length);
+      ret[length - 2] = '\r';
+      ret[length - 1] = '\n';
+      ret[length] = '\0';
+      printf("%d\n", length);
+      return (struct redis_str_int){ret, length};
     }
 
   case ARRAY:
@@ -135,8 +149,8 @@ const char *redis_serialize_object(redis_object *object)
       
       while(tmp_obj)
       {
-        const char *tmp = redis_serialize_object(tmp_obj);
-        bytes += strlen(tmp);
+        redis_str_int tuple = redis_serialize_object(tmp_obj);
+        bytes += tuple.length;
         
         if(bytes > buffer_length)
         {
@@ -147,7 +161,7 @@ const char *redis_serialize_object(redis_object *object)
             buffer = tmp_ptr;
         }
         
-        strncat(buffer, tmp, strlen(tmp));
+        strncat(buffer, tuple.value, tuple.length);
         tmp_obj = tmp_obj->next;
       }
       
@@ -155,7 +169,7 @@ const char *redis_serialize_object(redis_object *object)
       char *ret = calloc(ret_length, 1);
       snprintf(ret, ret_length, "*%d\r\n%s", object->length, buffer);
       free(buffer);
-      return ret;
+      return (struct redis_str_int){ret, ret_length};
     }
   }
 }
@@ -239,7 +253,7 @@ redis_object *redis_deserialize_object_internal(const char **data)
           
         int length = internal_deserialize_integer(data);
         char *value = internal_deserialize_string(data);
-        return redis_create_bulk_string(value, length);
+        return redis_create_bulk_string_fixed_length(value, length);
       }
     
     // ARRAY: *<integer>\r\n<entries>

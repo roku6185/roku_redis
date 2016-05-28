@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include "redis_connect.h"
@@ -19,6 +20,8 @@ return_code redis_write(const char *data, int length)
 
 return_code redis_send_command(redis_object *command)
 {
-  const char *tmp = redis_serialize_object(command);
-  return redis_write(tmp, strlen(tmp));
+  redis_str_int tuple = redis_serialize_object(command);
+  return_code status = redis_write(tuple.value, tuple.length);
+  free((char *)tuple.value);
+  return status;
 }

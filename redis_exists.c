@@ -10,13 +10,13 @@ return_code redis_exists(int num_keys, ...)
   va_start(args, num_keys);
   
   redis_object *cmd = redis_create_array();
-  redis_object *param1 = redis_create_bulk_string("EXISTS", 6);
+  redis_object *param1 = redis_create_bulk_string("EXISTS");
   redis_array_push_back(cmd, param1);
   
   for(int i = 0; i < num_keys; i++)
   {
     const char *arg = va_arg(args, const char *);
-    redis_object *param = redis_create_bulk_string(arg, strlen(arg));
+    redis_object *param = redis_create_bulk_string(arg);
     redis_array_push_back(cmd, param);
   }
   

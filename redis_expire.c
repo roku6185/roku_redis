@@ -6,13 +6,13 @@
 
 return_code redis_expire(const char *key, int ttl_seconds)
 {
-  redis_object *param1 = redis_create_bulk_string("EXPIRE", 6);
-  redis_object *param2 = redis_create_bulk_string(key, strlen(key));
+  redis_object *param1 = redis_create_bulk_string("EXPIRE");
+  redis_object *param2 = redis_create_bulk_string(key);
   
   // TODO: refactor this int -> string conversion
   char ttl_str[512];
   snprintf(ttl_str, 512, "%d", ttl_seconds);
-  redis_object *param3 = redis_create_bulk_string(ttl_str, strlen(ttl_str));
+  redis_object *param3 = redis_create_bulk_string(ttl_str);
   
   redis_object *cmd = redis_create_array();
   redis_array_push_back(cmd, param1);

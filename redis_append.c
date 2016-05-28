@@ -5,9 +5,9 @@
 
 return_code redis_append(const char *key, const char *value)
 {
-  redis_object *param1 = redis_create_bulk_string("APPEND", 6);
-  redis_object *param2 = redis_create_bulk_string(key, strlen(key));
-  redis_object *param3 = redis_create_bulk_string(value, strlen(value));
+  redis_object *param1 = redis_create_bulk_string("APPEND");
+  redis_object *param2 = redis_create_bulk_string(key);
+  redis_object *param3 = redis_create_bulk_string(value);
   redis_object *cmd = redis_create_array();
   redis_array_push_back(cmd, param1);
   redis_array_push_back(cmd, param2);
