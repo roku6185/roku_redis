@@ -1,0 +1,2 @@
+new: context-specific connections (i.e. multiple connections to servers)
+review: memory allocations (use valgrind)
