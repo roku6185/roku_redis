@@ -5,14 +5,20 @@ project(redis_client)
 file(GLOB LIBREDISCLIENT_SRC_FILES *.c)
 add_library(redisclient STATIC ${LIBREDISCLIENT_SRC_FILES})
 
-# Compile test programs
-link_directories(.)
-add_executable(main apps/main.c)
-target_link_libraries(main redisclient)
-set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin)
+# Compile programs
+file(GLOB APPS_SRC_FILES apps/*.c)
+
+foreach(APP_SRC ${APPS_SRC_FILES})
+  get_filename_component(APP_BIN ${APP_SRC} NAME_WE)
+  add_executable(${APP_BIN} ${APP_SRC})
+  set_target_properties(${APP_BIN}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "apps/bin"
+  )
+  target_link_libraries(${APP_BIN} redisclient)
+endforeach()
 
 # Compile unittests
-set(EXECUTABLE_OUTPUT_PATH tests/bin)
 add_subdirectory(unity)
 link_directories(unity)
 link_directories(.)
@@ -22,6 +28,10 @@ file(GLOB UNITTEST_SRC_FILES tests/*.c)
 foreach(TEST_SRC ${UNITTEST_SRC_FILES})
   get_filename_component(TEST_BIN ${TEST_SRC} NAME_WE)
   add_executable(${TEST_BIN} ${TEST_SRC})
+  set_target_properties(${TEST_BIN}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "tests/bin"
+  )
   target_link_libraries(${TEST_BIN} unity redisclient)
 endforeach()
 
