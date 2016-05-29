@@ -12,5 +12,8 @@ return_code redis_randomkey();
 return_code redis_ttl(const char *key);
 return_code redis_expire(const char *key, int ttl_seconds);
 return_code redis_ping(const char *message);
+return_code redis_get(const char *key);
+return_code redis_set(const char *key, const char *value);
+return_code redis_strlen(const char *key);
 
 #endif
