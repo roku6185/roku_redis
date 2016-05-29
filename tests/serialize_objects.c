@@ -136,7 +136,7 @@ void test_serialize_bulk_string4()
   redis_object *obj = redis_create_bulk_string_fixed_length(str, 11);
   redis_serialization obj_serialized = redis_serialize_object(obj);
   const char *expected = "$11\r\nnull \0 byte\r\n";
-  TEST_ASSERT_EQUAL_MEMORY(obj_serialized.value, expected, obj_serialized.length + 1);
+  TEST_ASSERT_EQUAL_MEMORY(obj_serialized.value, expected, obj_serialized.length);
   redis_free_object(obj);
   free((char*)obj_serialized.value);
 }

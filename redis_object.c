@@ -128,15 +128,12 @@ redis_serialization redis_serialize_object(redis_object *object)
 
   case BULK_STRING:
     {
-      int prefix_length = 1 + number_of_digits(object->length) + 2;  
-      int length = prefix_length + object->length + 2;
-      char *ret = malloc(length);
+      int prefix_length = 1 + number_of_digits(object->length) + 2;
+      int length = prefix_length + object->length + 2 + 1;
+      char *ret = calloc(length, 1);
       snprintf(ret, length, "$%d\r\n", object->length);
       memcpy(ret + prefix_length, object->value.string, object->length);
-      ret[length - 2] = '\r';
-      ret[length - 1] = '\n';
-      ret[length] = '\0';
-      printf("%d\n", length);
+      snprintf(ret + length - 3, 3, "\r\n");
       return (struct redis_serialization){ret, length};
     }
 
