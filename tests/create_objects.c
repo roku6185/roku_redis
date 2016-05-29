@@ -55,7 +55,7 @@ void test_create_bulk_string_fixed_length()
   redis_object *obj = redis_create_bulk_string_fixed_length(str, length);
   TEST_ASSERT_EQUAL(obj->type, BULK_STRING);
   TEST_ASSERT_EQUAL(obj->length, length);
-  TEST_ASSERT_EQUAL_MEMORY(obj->value.string, str, 11);
+  TEST_ASSERT_EQUAL_MEMORY(obj->value.string, str, 12);
   redis_free_object(obj);
 }
 
