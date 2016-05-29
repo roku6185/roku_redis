@@ -124,6 +124,15 @@ void test_deserialize_bulk_string3()
   redis_free_object(obj);
 }
 
+void test_deserialize_bulk_string4()
+{
+  redis_object *obj = redis_deserialize_object("$11\r\nnull \0 byte\r\n");
+  TEST_ASSERT_EQUAL(obj->type, BULK_STRING);
+  TEST_ASSERT_EQUAL(obj->length, 11);
+  TEST_ASSERT_EQUAL_MEMORY(obj->value.string, "null \0 byte", 12);
+  redis_free_object(obj);
+}
+
 void test_deserialize_array1()
 {
   redis_object *obj = redis_deserialize_object("*0\r\n");
@@ -223,6 +232,7 @@ int main()
   RUN_TEST(test_deserialize_bulk_string1);
   RUN_TEST(test_deserialize_bulk_string2);
   RUN_TEST(test_deserialize_bulk_string3);
+  RUN_TEST(test_deserialize_bulk_string4);
   RUN_TEST(test_deserialize_array1);
   RUN_TEST(test_deserialize_array2);
   RUN_TEST(test_deserialize_array3);
