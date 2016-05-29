@@ -28,11 +28,11 @@ typedef struct redis_object
   int length;
 } redis_object;
 
-typedef struct redis_str_int
+typedef struct redis_serialization
 {
   const char *value;
   int length;
-} redis_str_int;
+} redis_serialization;
 
 redis_object *redis_create_nil();
 redis_object *redis_create_integer(int value);
@@ -44,7 +44,7 @@ redis_object *redis_create_array();
 void redis_array_push_back(redis_object *parent, redis_object *child);
 
 void redis_pretty_print_object(redis_object *object);
-redis_str_int redis_serialize_object(redis_object *object);
+redis_serialization redis_serialize_object(redis_object *object);
 redis_object *redis_deserialize_object(const char *data);
 void redis_free_object(redis_object *object);
 

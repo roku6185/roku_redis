@@ -20,8 +20,8 @@ return_code redis_write(const char *data, int length)
 
 return_code redis_send_command(redis_object *command)
 {
-  redis_str_int tuple = redis_serialize_object(command);
-  return_code status = redis_write(tuple.value, tuple.length);
-  free((char *)tuple.value);
+  redis_serialization cmd_serialized = redis_serialize_object(command);
+  return_code status = redis_write(cmd_serialized.value, cmd_serialized.length);
+  free((char *)cmd_serialized.value);
   return status;
 }

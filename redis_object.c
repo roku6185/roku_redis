@@ -90,7 +90,7 @@ void redis_array_push_back(redis_object *parent, redis_object *child)
   parent->length++;
 }
 
-redis_str_int redis_serialize_object(redis_object *object)
+redis_serialization redis_serialize_object(redis_object *object)
 {
   switch(object->type)
   {
@@ -99,7 +99,7 @@ redis_str_int redis_serialize_object(redis_object *object)
       int length = 5 + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "$-1\r\n");
-      return (struct redis_str_int){ret, length};  
+      return (struct redis_serialization){ret, length};  
     }
     
   case INTEGER:
@@ -107,7 +107,7 @@ redis_str_int redis_serialize_object(redis_object *object)
       int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, ":%d\r\n", object->value.integer);
-      return (struct redis_str_int){ret, length};
+      return (struct redis_serialization){ret, length};
     }
 
   case STRING:
@@ -115,7 +115,7 @@ redis_str_int redis_serialize_object(redis_object *object)
       int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "+%s\r\n", object->value.string);
-      return (struct redis_str_int){ret, length};
+      return (struct redis_serialization){ret, length};
     }
     
   case ERROR:
@@ -123,7 +123,7 @@ redis_str_int redis_serialize_object(redis_object *object)
       int length = 3 + object->length + 1;
       char *ret = malloc(length);
       snprintf(ret, length, "-%s\r\n", object->value.string);
-      return (struct redis_str_int){ret, length};
+      return (struct redis_serialization){ret, length};
     }
 
   case BULK_STRING:
@@ -137,7 +137,7 @@ redis_str_int redis_serialize_object(redis_object *object)
       ret[length - 1] = '\n';
       ret[length] = '\0';
       printf("%d\n", length);
-      return (struct redis_str_int){ret, length};
+      return (struct redis_serialization){ret, length};
     }
 
   case ARRAY:
@@ -149,8 +149,8 @@ redis_str_int redis_serialize_object(redis_object *object)
       
       while(tmp_obj)
       {
-        redis_str_int tuple = redis_serialize_object(tmp_obj);
-        bytes += tuple.length;
+        redis_serialization obj_serialized = redis_serialize_object(tmp_obj);
+        bytes += obj_serialized.length;
         
         if(bytes > buffer_length)
         {
@@ -161,7 +161,7 @@ redis_str_int redis_serialize_object(redis_object *object)
             buffer = tmp_ptr;
         }
         
-        strncat(buffer, tuple.value, tuple.length);
+        strncat(buffer, obj_serialized.value, obj_serialized.length);
         tmp_obj = tmp_obj->next;
       }
       
@@ -169,7 +169,7 @@ redis_str_int redis_serialize_object(redis_object *object)
       char *ret = calloc(ret_length, 1);
       snprintf(ret, ret_length, "*%d\r\n%s", object->length, buffer);
       free(buffer);
-      return (struct redis_str_int){ret, ret_length};
+      return (struct redis_serialization){ret, ret_length};
     }
   }
 }
