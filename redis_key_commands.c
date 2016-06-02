@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include "redis_key_commands.h"
 #include "redis_write.h"
 #include "redis_return_codes.h"
 
