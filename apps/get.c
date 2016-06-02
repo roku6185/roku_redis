@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "redis_commands.h"
+#include "redis_string_commands.h"
 #include "redis_connect.h"
 #include "redis_read.h"
 #include "redis_write.h"
