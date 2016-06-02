@@ -1,5 +1,5 @@
-#ifndef _REDIS_COMMANDS_H_
-#define _REDIS_COMMANDS_H_
+#ifndef _REDIS_KEY_COMMANDS_H_
+#define _REDIS_KEY_COMMANDS_H_
 
 #include "redis_object.h"
 #include "redis_return_codes.h"
