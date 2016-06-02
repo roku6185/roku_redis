@@ -5,5 +5,6 @@
 #include "redis_return_codes.h"
 
 return_code redis_ping(const char *message);
+return_code redis_quit();
 
 #endif

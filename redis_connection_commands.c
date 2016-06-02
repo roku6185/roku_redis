@@ -11,3 +11,11 @@ return_code redis_ping(const char *message)
   redis_array_push_back(cmd, param2);
   return redis_send_command(cmd);
 }
+
+return_code redis_quit()
+{
+  redis_object *param1 = redis_create_bulk_string("QUIT");
+  redis_object *cmd = redis_create_array();
+  redis_array_push_back(cmd, param1);
+  return redis_send_command(cmd);
+}
