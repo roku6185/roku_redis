@@ -1,6 +1,8 @@
 #ifndef _REDIS_DATA_TYPE_H_
 #define _REDIS_DATA_TYPE_H_
 
+#include "redis_return_codes.h"
+
 typedef struct redis_object redis_object;
 
 typedef enum
@@ -47,5 +49,7 @@ void redis_pretty_print_object(redis_object *object);
 redis_serialization redis_serialize_object(redis_object *object);
 redis_object *redis_deserialize_object(const char *data);
 void redis_free_object(redis_object *object);
+
+int redis_object_to_integer(redis_object *object, return_code *status);
 
 #endif

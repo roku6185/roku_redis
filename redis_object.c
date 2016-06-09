@@ -362,3 +362,15 @@ void redis_pretty_print_object(redis_object *object)
 {
   redis_pretty_print_recursive(object, 2);
 }
+
+int redis_object_to_integer(redis_object *object, return_code *status)
+{
+  if(object->type == INTEGER)
+  {
+    *status = SUCCESS;
+    return object->value.integer;
+  }
+  
+  *status = OBJECT_INVALID_TYPE;
+  return -1;
+}
