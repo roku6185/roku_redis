@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include "redis_write.h"
+#include "redis_io.h"
 #include "redis_return_codes.h"
 
 return_code redis_del(int num_keys, ...)
