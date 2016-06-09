@@ -1,8 +1,9 @@
+#include <stdio.h>
 #include <string.h>
-#include "redis_write.h"
+#include "redis_io.h"
 #include "redis_return_codes.h"
 
-return_code redis_append(const char *key, const char *value)
+int redis_append(const char *key, const char *value, return_code *status)
 {
   redis_object *param1 = redis_create_bulk_string("APPEND");
   redis_object *param2 = redis_create_bulk_string(key);
@@ -11,7 +12,13 @@ return_code redis_append(const char *key, const char *value)
   redis_array_push_back(cmd, param1);
   redis_array_push_back(cmd, param2);
   redis_array_push_back(cmd, param3);
-  return redis_send_command(cmd);
+  
+  redis_object *obj = redis_send_and_receive_command(cmd, status);
+  
+  if(*status == SUCCESS && obj)
+    return redis_object_to_integer(obj, status);
+  
+  return -1;
 }
 
 return_code redis_get(const char *key)
