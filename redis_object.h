@@ -51,5 +51,6 @@ redis_object *redis_deserialize_object(const char *data);
 void redis_free_object(redis_object *object);
 
 int redis_object_to_integer(redis_object *object, return_code *status);
+const char *redis_object_to_string(redis_object *object, return_code *status);
 
 #endif

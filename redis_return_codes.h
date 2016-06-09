@@ -16,4 +16,10 @@ typedef enum
   OBJECT_INVALID_TYPE,
 } return_code;
 
+typedef enum
+{
+  FALSE,
+  TRUE,
+} bool;
+
 #endif

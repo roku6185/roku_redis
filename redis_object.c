@@ -374,3 +374,15 @@ int redis_object_to_integer(redis_object *object, return_code *status)
   *status = OBJECT_INVALID_TYPE;
   return -1;
 }
+
+const char *redis_object_to_string(redis_object *object, return_code *status)
+{
+  if(object->type == STRING)
+  {
+    *status = SUCCESS;
+    return object->value.string;
+  }
+  
+  *status = OBJECT_INVALID_TYPE;
+  return NULL;
+}
