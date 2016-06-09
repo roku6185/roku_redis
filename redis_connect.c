@@ -38,6 +38,7 @@ return_code redis_connect(const char *hostname, const char *port)
 
   conn.fd = fd;
   conn.events = POLLIN;
+  conn.revents = 0;
 
   freeaddrinfo(servinfo);
   return SUCCESS;
@@ -45,7 +46,7 @@ return_code redis_connect(const char *hostname, const char *port)
 
 return_code redis_close()
 {
-  if(conn.fd)
+  if(conn.fd > 0)
   {
     close(conn.fd);
     conn.fd = -1;
