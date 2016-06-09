@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "redis_connect.h"
-#include "redis_write.h"
-#include "redis_read.h"
 #include "redis_object.h"
+#include "redis_io.h"
 
 int main()
 {
