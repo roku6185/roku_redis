@@ -43,12 +43,18 @@ return_code redis_set(const char *key, const char *value)
   return redis_send_command(cmd);
 }
 
-return_code redis_strlen(const char *key)
+int redis_strlen(const char *key, return_code *status)
 {
   redis_object *param1 = redis_create_bulk_string("STRLEN");
   redis_object *param2 = redis_create_bulk_string(key);
   redis_object *cmd = redis_create_array();
   redis_array_push_back(cmd, param1);
   redis_array_push_back(cmd, param2);
-  return redis_send_command(cmd);
+  
+  redis_object *obj = redis_send_and_receive_command(cmd, status);
+  
+  if(*status == SUCCESS && obj)
+    return redis_object_to_integer(obj, status);
+  
+  return -1;
 }

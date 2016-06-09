@@ -16,16 +16,8 @@ int main()
     return 1;
   }
   
-  redis_strlen("testkey");
-  
-  char *buffer = NULL;
-  
-  if((status = redis_read(&buffer)) == SUCCESS)
-  {
-    redis_object *response = redis_deserialize_object(buffer);
-    printf("Received response:\n");
-    redis_pretty_print_object(response);
-  }
-  
+  int ret = 0;
+  ret = redis_strlen("testkey", &status);
+  printf("Strlen=%d\n", ret);
   return 0;
 }
