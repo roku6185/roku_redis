@@ -16,19 +16,28 @@ int main()
     return 1;
   }
   
-  redis_hset("mykey", "myfield1", "my test value 1");
-  redis_hset("mykey", "myfield2", "my test value 2");
-  redis_hset("mykey", "myfield3", "my test value 3");
-  redis_hdel("mykey", 1, "myfield1");
-  redis_hdel("mykey", 2, "myfield2", "myfield3");
+  int response = -1;
+  const char *key = "mykey";
+  const char *field1 = "myfield1";
+  const char *field2 = "myfield2";
+  const char *field3 = "myfield3";
+  const char *value1 = "my test value 1";
+  const char *value2 = "my test value 2";
+  const char *value3 = "my test value 3";
   
-  char *buffer = NULL;
-  if((status = redis_read(&buffer)) == SUCCESS)
-  {
-    redis_object *response = redis_deserialize_object(buffer);
-    printf("Received response:\n");
-    redis_pretty_print_object(response);
-  }
-  
+  if(redis_hset(&response, key, field1, value1) == SUCCESS)
+    printf("%s.%s=%s\n", key, field1, value1);
+    
+  if(redis_hset(&response, key, field2, value2) == SUCCESS)
+    printf("%s.%s=%s\n", key, field2, value2);
+    
+  if(redis_hset(&response, key, field3, value3) == SUCCESS)
+    printf("%s.%s=%s\n", key, field3, value3);
+    
+  if(redis_hdel(&response, key, 1, field1) == SUCCESS)
+    printf("%d fields deleted\n", response);
+    
+  if(redis_hdel(&response, key, 2, field2, field3) == SUCCESS)
+    printf("%d fields deleted\n", response);
   return 0;
 }

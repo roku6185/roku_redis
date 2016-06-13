@@ -16,16 +16,15 @@ int main()
     return 1;
   }
   
-  redis_hset("mykey", "myfield", "my test value");
-  redis_hexists("mykey", "myfield");
+  int response = -1;
+  const char *key = "mykey";
+  const char *field = "myfield";
+  const char *value = "my test value";
   
-  char *buffer = NULL;
-  if((status = redis_read(&buffer)) == SUCCESS)
-  {
-    redis_object *response = redis_deserialize_object(buffer);
-    printf("Received response:\n");
-    redis_pretty_print_object(response);
-  }
+  if(redis_hset(&response, key, field, value) == SUCCESS)
+    printf("%s.%s=%s\n", key, field, value);
   
+  if(redis_hexists(&response, key, field) == SUCCESS)
+    printf("Exists %s.%s? %s\n", key, field, response > 0 ? "YES" : "NO");
   return 0;
 }
