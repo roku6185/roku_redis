@@ -16,15 +16,10 @@ int main()
     return 1;
   }
   
-  redis_exists(2, "testkey", "mykey");
+  int response = -1;
   
-  char *buffer = NULL;
-  if((status = redis_read(&buffer)) == SUCCESS)
-  {
-    redis_object *response = redis_deserialize_object(buffer);
-    printf("Received response:\n");
-    redis_pretty_print_object(response);
-  }
+  if(redis_exists(&response, 2, "testkey", "mykey") == SUCCESS)
+    printf("%d keys exists\n", response);
   
   return 0;
 }

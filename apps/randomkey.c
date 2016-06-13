@@ -16,15 +16,11 @@ int main()
     return 1;
   }
   
-  redis_randomkey();
+  redis_object *response = NULL;
   
-  char *buffer = NULL;
-  if((status = redis_read(&buffer)) == SUCCESS)
-  {
-    redis_object *response = redis_deserialize_object(buffer);
-    printf("Received response:\n");
+  if(redis_randomkey(&response) == SUCCESS)
     redis_pretty_print_object(response);
-  }
   
+  redis_free_object(response);
   return 0;
 }
