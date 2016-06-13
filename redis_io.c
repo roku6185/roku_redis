@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -127,17 +128,69 @@ return_code redis_send_command(redis_object *command)
 }
 
 
-redis_object *redis_send_and_receive_command(redis_object *command, return_code *status)
+return_code redis_send_and_receive_command(redis_object *cmd, redis_object **response)
 {
-  char *buffer = NULL;
+  return_code status;
   
-  if((*status = redis_send_command(command)) != SUCCESS)
-    return NULL;
+  if((status = redis_send_command(cmd)) == SUCCESS)
+  {
+    char *buffer = NULL;
     
-  if((*status = redis_read(&buffer)) != SUCCESS)
-    return NULL;
+    if((status = redis_read(&buffer)) == SUCCESS)
+    {
+      *response = redis_deserialize_object(buffer);      
+      
+      if(buffer != NULL)
+        free(buffer);
+      
+      return SUCCESS;
+    }
+  }
+  
+  return status;
+}
+
+return_code redis_send_then_wait_for_int(redis_object *cmd, int *response)
+{
+  return_code status;
+  redis_object *obj = NULL;
+  *response = -1;
+  
+  if((status = redis_send_and_receive_command(cmd, &obj)) == SUCCESS)
+  {
+    if((status = redis_object_to_integer(obj, response)) == SUCCESS)
+      return SUCCESS;
+  }
+  
+  return status;
+}
+
+return_code redis_send_then_wait_for_ok(redis_object *cmd, bool *response)
+{
+  return_code status;
+  redis_object *obj = NULL;
+  *response = FALSE;
+  
+  if((status = redis_send_and_receive_command(cmd, &obj)) == SUCCESS)
+  {
+    const char *reply = NULL;
     
-  redis_object *object = redis_deserialize_object(buffer);
-  free(buffer);
-  return object;
+    if((status = redis_object_to_string(obj, &reply)) == SUCCESS)
+    {
+      if(reply && (strncmp(reply, "OK", 2) == 0))
+        *response = TRUE;
+    }
+  }
+  
+  return status;
+}
+
+return_code redis_send_then_wait_for_object(redis_object *cmd, redis_object **response)
+{
+  return_code status;
+  
+  if((status = redis_send_and_receive_command(cmd, response)) == SUCCESS)
+    return SUCCESS;
+    
+  return status;
 }

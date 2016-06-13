@@ -293,6 +293,13 @@ void redis_free_object(redis_object *object)
     
   switch(object->type)
   {
+  case STRING:
+  case BULK_STRING:
+    {
+      free((char *)object->value.string);
+      return;
+    }
+    
   case ARRAY:
     {
       redis_object *parent = object;
@@ -363,26 +370,28 @@ void redis_pretty_print_object(redis_object *object)
   redis_pretty_print_recursive(object, 2);
 }
 
-int redis_object_to_integer(redis_object *object, return_code *status)
+return_code redis_object_to_integer(redis_object *object, int *result)
 {
+  return_code status = OBJECT_INVALID_TYPE;
+  
   if(object->type == INTEGER)
   {
-    *status = SUCCESS;
-    return object->value.integer;
+    status = SUCCESS;
+    *result = object->value.integer;
   }
   
-  *status = OBJECT_INVALID_TYPE;
-  return -1;
+  return status;
 }
 
-const char *redis_object_to_string(redis_object *object, return_code *status)
+return_code redis_object_to_string(redis_object *object, const char **result)
 {
+  return_code status = OBJECT_INVALID_TYPE;
+  
   if(object->type == STRING)
   {
-    *status = SUCCESS;
-    return object->value.string;
+    status = SUCCESS;
+    *result = object->value.string;
   }
   
-  *status = OBJECT_INVALID_TYPE;
-  return NULL;
+  return status;
 }

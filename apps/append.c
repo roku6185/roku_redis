@@ -23,13 +23,15 @@ int main()
   sprintf(key, "%ld", now);
   printf("Using key=%s\n", key);
   
-  int ret = 0;
+  int response;
+  
   const char *value1 = "abc";
-  ret = redis_append(key, value1, &status);
-  printf("Appended=%s: %s\n", value1, ret == strlen(value1) ? "OK" : "FAIL");
+  if(redis_append(key, value1, &response) == SUCCESS)
+    printf("Appended=%s: %s\n", value1, response == strlen(value1) ? "OK" : "FAIL");
   
   const char *value2 = "defghji";
-  ret = redis_append(key, value2, &status);
-  printf("Appended=%s: %s\n", value2, ret == strlen(value1) + strlen(value2) ? "OK" : "FAIL");
+  if(redis_append(key, value2, &response) == SUCCESS)
+    printf("Appended=%s: %s\n", value2, response == strlen(value1) + strlen(value2) ? "OK" : "FAIL");
+    
   return 0;
 }

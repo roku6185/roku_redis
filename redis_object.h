@@ -50,7 +50,7 @@ redis_serialization redis_serialize_object(redis_object *object);
 redis_object *redis_deserialize_object(const char *data);
 void redis_free_object(redis_object *object);
 
-int redis_object_to_integer(redis_object *object, return_code *status);
-const char *redis_object_to_string(redis_object *object, return_code *status);
+return_code redis_object_to_integer(redis_object *object, int *result);
+return_code redis_object_to_string(redis_object *object, const char **result);
 
 #endif

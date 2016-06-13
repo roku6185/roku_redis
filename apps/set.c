@@ -16,7 +16,10 @@ int main()
     return 1;
   }
   
-  bool ret = redis_set("testkey", "my value in key", &status);
-  printf("Response: %s\n", ret == TRUE ? "OK" : "FAIL");
+  bool response; 
+  
+  if(redis_set("testkey", "my value in key", &response) == SUCCESS)
+    printf("Response: %s\n", response == TRUE ? "OK" : "FAIL");
+    
   return 0;
 }

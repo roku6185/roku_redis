@@ -16,7 +16,10 @@ int main()
     return 1;
   }
   
-  redis_object *response = redis_get("testkey", &status);
-  redis_pretty_print_object(response);
+  redis_object *response = NULL;
+  if(redis_get("testkey", &response) == SUCCESS)
+    redis_pretty_print_object(response);
+  
+  redis_free_object(response);
   return 0;
 }

@@ -16,8 +16,10 @@ int main()
     return 1;
   }
   
-  int ret = 0;
-  ret = redis_strlen("testkey", &status);
-  printf("Strlen=%d\n", ret);
+  int response;
+  
+  if(redis_strlen("testkey", &response) == SUCCESS)
+    printf("Strlen=%d\n", response);
+    
   return 0;
 }
